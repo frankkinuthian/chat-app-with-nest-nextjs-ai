@@ -3,15 +3,20 @@
 import * as React from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import { WeatherCard } from "../components/Weathercard";
 
 export default function Home() {
   const [selectedModel, setSelectedModel] = React.useState(
     "google/gemini-2.5-flash-lite"
   );
+
+  const selectedModelRef = React.useRef(selectedModel);
+  selectedModelRef.current = selectedModel;
+
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       api: `${process.env.NEXT_PUBLIC_API_URL}/chat`,
-      body: { model: selectedModel },
+      body: () => ({ model: selectedModelRef.current }),
     }),
   });
   const [input, setInput] = React.useState("");
@@ -69,6 +74,14 @@ export default function Home() {
                       </div>
                     );
                   }
+                  if (
+                    part.type === "tool-getWeather" &&
+                    part.state === "output-available"
+                  ) {
+                    return (
+                      <WeatherCard key={index} data={part.output as any} />
+                    );
+                  }
                   return null;
                 })}
               </div>
@@ -96,35 +109,35 @@ export default function Home() {
             </div>
           </div>
         )}
-
-        {/* form */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (input.trim()) {
-              sendMessage({
-                text: input,
-              });
-              setInput("");
-            }
-          }}
-          className="flex gap-2"
-        >
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500"
-          />
-          <button
-            type="submit"
-            disabled={status !== "ready" || !input.trim()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Send
-          </button>
-        </form>
       </div>
+
+      {/* form */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (input.trim()) {
+            sendMessage({
+              text: input,
+            });
+            setInput("");
+          }
+        }}
+        className="flex gap-2"
+      >
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          className="flex-1 px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500"
+        />
+        <button
+          type="submit"
+          disabled={status !== "ready" || !input.trim()}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          Send
+        </button>
+      </form>
     </div>
   );
 }
