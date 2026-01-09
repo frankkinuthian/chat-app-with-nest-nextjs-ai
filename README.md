@@ -1,36 +1,97 @@
-# Turborepo starter
+# Vercel AI SDK + NestJS + Next.js Chat
 
-This Turborepo starter is maintained by the Turborepo core team.
+A full-stack AI chat application built with the Vercel AI SDK, featuring a NestJS backend and Next.js frontend in a Turborepo monorepo.
 
-## Using this example
+## Features
 
-Run the following command:
+- 🤖 AI-powered chat with streaming responses
+- 🔧 Custom tools support via Vercel AI SDK
+- 🌐 Multi-model support through Vercel AI Gateway
+- ⚡ Real-time streaming with React hooks
+- 🎨 Modern UI with Tailwind CSS
+- 📦 Monorepo structure with Turborepo
 
-```sh
-npx create-turbo@latest
+## Architecture
+
+### Apps
+
+- **`backend`**: NestJS REST API server with AI SDK integration
+  - Handles chat requests with streaming responses
+  - Custom tools implementation
+  - CORS-enabled for frontend communication
+- **`web`**: Next.js 16 frontend with Turbopack
+  - Real-time chat interface using `@ai-sdk/react`
+  - Model selection UI
+  - Streaming message display
+
+### Packages
+
+- `@repo/ui`: Shared React component library
+- `@repo/eslint-config`: ESLint configurations
+- `@repo/typescript-config`: TypeScript configurations
+
+All apps and packages are written in [TypeScript](https://www.typescriptlang.org/).
+
+## Prerequisites
+
+- [Bun](https://bun.sh/) >= 1.3.4
+- Node.js >= 18
+- Vercel AI Gateway API key
+
+## Getting Started
+
+### 1. Install Dependencies
+
+```bash
+bun install
 ```
 
-## What's inside?
+### 2. Environment Setup
 
-This Turborepo includes the following packages/apps:
+Create `.env` files in both apps:
 
-### Apps and Packages
+**Backend (`apps/backend/.env`):**
+```env
+AI_GATEWAY_API_KEY=your_vercel_ai_gateway_key
+FRONTEND_URL=http://localhost:3000
+```
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+**Frontend (`apps/web/.env`):**
+```env
+API_URL=http://localhost:3003
+NEXT_PUBLIC_API_URL=http://localhost:3003
+```
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+See `.env.example` files in each app directory for reference.
 
-### Utilities
+### 3. Run Development Servers
 
-This Turborepo has some additional tools already setup for you:
+**Option 1: Run both apps together (if configured):**
+```bash
+bun turbo dev
+```
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+**Option 2: Run individually:**
+```bash
+# Terminal 1 - Backend (port 3003)
+cd apps/backend
+bun run dev
+
+# Terminal 2 - Frontend (port 3000)
+cd apps/web
+bun run dev
+```
+
+### 4. Access the App
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Tech Stack
+
+- **Frontend**: Next.js 16, React 19, Tailwind CSS, Vercel AI SDK
+- **Backend**: NestJS, Vercel AI SDK, Express
+- **Tooling**: Turborepo, TypeScript, ESLint, Prettier
+- **Runtime**: Bun
 
 ### Build
 
