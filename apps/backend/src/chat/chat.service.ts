@@ -1,25 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import {
-  UIMessage,
-  ModelMessage,
   convertToModelMessages,
+  ModelMessage,
   streamText,
+  UIMessage,
 } from 'ai';
 import { Response } from 'express';
+import { ToolsService } from './tools.service';
 
 @Injectable()
 export class ChatService {
-  async chat(
-    messages: UIMessage[],
-    model: string,
-    response: Response,
-  ): Promise<void> {
-    const modelMessages: ModelMessage[] =
-      await convertToModelMessages(messages);
+  constructor(private readonly toolsService: ToolsService) {}
+
+  async chat(messages: UIMessage[], model: string, response: Response) {
+    const convertedMessages = await convertToModelMessages(messages);
+    const modelMessages: ModelMessage[] = [
+      { role: 'system', content: this.getSystemPrompt() },
+      ...convertedMessages,
+    ];
+
     const result = streamText({
       model,
       messages: modelMessages,
+      tools: this.toolsService.getAllTools(),
     });
-    result.pipeTextStreamToResponse(response);
+    return result.pipeUIMessageStreamToResponse(response);
+  }
+
+  private getSystemPrompt() {
+    return 'You are a generic chat bot that can answer any questions, but also use the tools that we define to answer the user';
   }
 }
